@@ -27,10 +27,19 @@ impl BashManager {
     input
   }
 
+  pub fn execute(&self, pipe_sections: Vec<Command>){
+
+  }
+
   pub fn run(&self) {
     self.show_path();
     let command = self.read_command();
     let pipe_sections: Vec<Command> = parser_helper::parse_line(command);
+    if(pipe_sections[0].command_name.eq("exit")){
+      return
+    }
+    self.execute(pipe_sections);
+    self.run();
   }
 
 }
