@@ -2,7 +2,6 @@
 mod domain;
 mod infra;
 
-use crate::domain::model::argument;
 use whoami;
 
 use crate::infra::bash_manager::BashManager;
