@@ -1,3 +1,13 @@
+
+mod domain;
+mod infra;
+
+use crate::domain::model::argument;
+use whoami;
+
+use crate::infra::bash_manager::BashManager;
+
 fn main() {
-    println!("Hello, world!");
+    let bash = BashManager{ username: whoami::username() };
+    bash.run();
 }
