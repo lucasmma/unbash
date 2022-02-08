@@ -1,6 +1,8 @@
 use std::{thread, time};
 use std::fs;
 use std::io::Error;
+use crate::infra::bash_manager::BashManager;
+use crate::domain::model::command::Command;
 
 pub fn get_current_directory()-> String {
   let current_path = std::env::current_dir().unwrap();
@@ -73,11 +75,35 @@ pub fn mkdir(args: Vec<String>) {
   }
 }
 
-pub fn echo(args: Vec<String>){
+pub fn inline_args(args: Vec<String>) -> String{
   let mut phrase : String = String::from("");
   for arg in args {
     phrase.push_str(&arg);
     phrase.push_str(" ");
   }
+  phrase
+}
+
+pub fn echo(args: Vec<String>) {
+  let phrase : String = inline_args(args);
   println!("{}", phrase);
+}
+
+pub fn history(args: Vec<String>, mut bash: BashManager) {
+  if args.len() == 0 {
+    for commands in bash.history.clone() {
+      print!("{}", commands);
+    }
+  } else if args.len() > 1 {
+    println!("Comando com mais de um argumento");
+  } else{
+    let number: usize = args[0].parse::<usize>().unwrap().try_into().unwrap();
+    if number > 0 && number <= 10 && number < bash.history.len() {
+      let command: Vec<Command> = bash.parse_command(bash.history[number-1].clone());
+      bash.execute(command);
+    } else{
+      println!("Número fora da range");
+    }
+  }
+
 }

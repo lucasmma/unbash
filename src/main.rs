@@ -7,6 +7,6 @@ use whoami;
 use crate::infra::bash_manager::BashManager;
 
 fn main() {
-    let bash = BashManager{ username: whoami::username() };
+    let mut bash = BashManager{ username: whoami::username(), history: vec![] };
     bash.run();
 }
