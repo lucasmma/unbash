@@ -115,8 +115,6 @@ pub fn history(args: Vec<String>, mut bash: BashManager) {
       Err(_e) => {
         println!("Argumento não é um número")
       },
-    };
-    
+    }; 
   }
-
 }
