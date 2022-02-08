@@ -62,3 +62,13 @@ pub fn cat(args: Vec<String>) {
     }
   }
 }
+
+pub fn mkdir(args: Vec<String>) {
+  if args.len() == 0 {
+    println!("Nenhum argumento no comando");
+  } else if args.len() > 1 {
+    println!("Comando com mais de um argumento");
+  } else{
+    fs::create_dir(args[0].as_str()).unwrap();
+  }
+}
