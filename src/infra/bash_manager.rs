@@ -2,8 +2,7 @@ use std::io;
 use std::io::Write;
 use crate::domain::model::command::Command;
 use crate::infra::os_manager;
-
-#[path = "../utils/parser_helper.rs"] mod parser_helper;
+use crate::utils::parser_helper;
 
 #[derive(Clone)]
 pub struct BashManager {

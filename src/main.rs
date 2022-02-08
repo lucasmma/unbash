@@ -1,14 +1,14 @@
 
 mod domain;
 mod infra;
+mod utils;
 
 use whoami;
 
 use crate::infra::bash_manager::BashManager;
 use crate::infra::os_manager::get_home_directory;
-
-#[path = "utils/file_helper.rs"] mod file_helper;
-
+use crate::utils::parser_helper;
+use crate::utils::file_helper;
 
 fn read_profile(filename: String) -> Vec<String> {
     let mut home_path: String = get_home_directory();
@@ -20,10 +20,11 @@ fn read_profile(filename: String) -> Vec<String> {
     
     if content.eq("anything") {
         file_helper::create_file(home_path);
+        return vec![]
     }
     
-    
-    return vec![]
+    return parser_helper::parse_paths(content);
+
 }
 
 fn main() {

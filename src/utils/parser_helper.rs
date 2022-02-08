@@ -12,3 +12,12 @@ pub fn parse_commandline(line: String) -> Vec<Command>{
 
   return pipe_sections_parsed;
 }
+
+pub fn parse_paths(line: String) -> Vec<String>{
+  if line.len() == 0 {
+    return vec![]
+  } else {
+    let straigth_path = line.replace("PATH=", "");
+    return straigth_path.split(";").map(|s| s.to_string()).collect();
+  }
+}
