@@ -7,7 +7,8 @@ use crate::utils::parser_helper;
 #[derive(Clone)]
 pub struct BashManager {
   pub username: String,
-  pub history: Vec<String>
+  pub history: Vec<String>,
+  pub paths: Vec<String>
 }
 
 impl BashManager {

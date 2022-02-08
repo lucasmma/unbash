@@ -28,7 +28,7 @@ fn read_profile(filename: String) -> Vec<String> {
 }
 
 fn main() {
-    read_profile(String::from("/.unbshrc_profile"));
-    let mut bash = BashManager{ username: whoami::username(), history: vec![] };
+    let paths : Vec<String> = read_profile(String::from("/.unbshrc_profile"));
+    let mut bash = BashManager{ username: whoami::username(), history: vec![], paths: paths };
     bash.run();
 }
