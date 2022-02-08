@@ -28,6 +28,7 @@ impl BashManager {
       "sleep" => os_manager::sleep(initial_section.args),
       "cat" => os_manager::cat(initial_section.args),
       "mkdir" => os_manager::mkdir(initial_section.args),
+      "echo" => os_manager::echo(initial_section.args),
       _ => println!("qualquer coisa")
     }
   }

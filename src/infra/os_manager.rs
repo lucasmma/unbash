@@ -72,3 +72,12 @@ pub fn mkdir(args: Vec<String>) {
     fs::create_dir(args[0].as_str()).unwrap();
   }
 }
+
+pub fn echo(args: Vec<String>){
+  let mut phrase : String = String::from("");
+  for arg in args {
+    phrase.push_str(&arg);
+    phrase.push_str(" ");
+  }
+  println!("{}", phrase);
+}
