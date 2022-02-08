@@ -1,6 +1,6 @@
 use crate::domain::model::command::Command;
 
-pub fn parse_line(line: String) -> Vec<Command>{
+pub fn parse_commandline(line: String) -> Vec<Command>{
   let pipe_sections = line.split("|");
   let mut pipe_sections_parsed: Vec<Command> = vec![];
   for pipe_section in pipe_sections {
