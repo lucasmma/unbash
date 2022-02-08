@@ -25,9 +25,15 @@ pub fn sleep(args: Vec<String>) {
   } else if args.len() > 1 {
     println!("Comando com mais de um argumento");
   } else {
-    let number: i64 = args[0].parse::<i64>().unwrap().try_into().unwrap();
-    let millis = time::Duration::from_millis((number * 1000).try_into().unwrap());
-    thread::sleep(millis);
+    match args[0].parse::<i64>() {
+      Ok(num) => {
+        let millis = time::Duration::from_millis((num * 1000).try_into().unwrap());
+        thread::sleep(millis);
+      },
+      Err(_e) => {
+        println!("Argumento não é um número")
+      },
+    }    
   }
 }
 
@@ -97,13 +103,20 @@ pub fn history(args: Vec<String>, mut bash: BashManager) {
   } else if args.len() > 1 {
     println!("Comando com mais de um argumento");
   } else{
-    let number: usize = args[0].parse::<usize>().unwrap().try_into().unwrap();
-    if number > 0 && number <= 10 && number < bash.history.len() {
-      let command: Vec<Command> = bash.parse_command(bash.history[number-1].clone());
-      bash.execute(command);
-    } else{
-      println!("Número fora da range");
-    }
+    match args[0].parse::<usize>() {
+      Ok(num) => {
+        if num > 0 && num <= 10 && num < bash.history.len() {
+          let command: Vec<Command> = bash.parse_command(bash.history[num-1].clone());
+          bash.execute(command);
+        } else{
+          println!("Número fora da range");
+        }
+      },
+      Err(_e) => {
+        println!("Argumento não é um número")
+      },
+    };
+    
   }
 
 }
