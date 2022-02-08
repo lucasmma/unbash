@@ -31,17 +31,15 @@ impl BashManager {
   }
 
   pub fn execute(&self, pipe_sections: Vec<Command>){
-    let initial_section = pipe_sections[0].clone();
-    match initial_section.command_name.as_str() {
-      "cd" => os_manager::cd(initial_section.args),
-      "ls" => os_manager::ls(initial_section.args),
-      "sleep" => os_manager::sleep(initial_section.args),
-      "cat" => os_manager::cat(initial_section.args),
-      "mkdir" => os_manager::mkdir(initial_section.args),
-      "echo" => os_manager::echo(initial_section.args),
-      "history" => os_manager::history(initial_section.args, (*self).clone()),
-      "ver" => os_manager::ver(initial_section.args),
-      _ => println!("qualquer coisa")
+    for section in pipe_sections.clone() {
+      match section.command_name.as_str() {
+        "cd" => os_manager::cd(section.args),
+        "ver" => os_manager::ver(section.args),
+        "history" => os_manager::history(section.args, (*self).clone()),
+        _ => {
+          os_manager::execute_command(section, (*self).clone());
+        }
+      }
     }
   }
 
@@ -53,6 +51,13 @@ impl BashManager {
   pub fn run(&mut self) {
     self.show_path();
     let command = self.read_command();
+    
+    if command.len() == 0{
+      self.run();
+      return
+    }
+
+
     let pipe_sections: Vec<Command> = self.parse_command(command.clone());
 
     if pipe_sections[0].command_name.eq("exit") {
