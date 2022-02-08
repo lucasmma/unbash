@@ -3,10 +3,20 @@ use std::fs;
 use std::io::Error;
 use crate::infra::bash_manager::BashManager;
 use crate::domain::model::command::Command;
+use home;
 
 pub fn get_current_directory()-> String {
   let current_path = std::env::current_dir().unwrap();
   current_path.display().to_string()
+}
+
+pub fn get_home_directory() -> String {
+  let mut home_path = String::from("");
+  match home::home_dir() {
+    Some(path) => home_path = path.display().to_string() ,
+    None => println!("Impossible to get your home dir!"),
+  }
+  home_path
 }
 
 pub fn cd(args: Vec<String>) {

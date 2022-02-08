@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 whoami = "1.2.1"
+home = "0.5.3"
