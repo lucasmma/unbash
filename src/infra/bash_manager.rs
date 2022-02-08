@@ -51,15 +51,12 @@ impl BashManager {
   pub fn run(&mut self) {
     self.show_path();
     let command = self.read_command();
-    
     if command.len() == 0{
       self.run();
       return
     }
 
-
     let pipe_sections: Vec<Command> = self.parse_command(command.clone());
-
     if pipe_sections[0].command_name.eq("exit") {
       return
     }

@@ -74,7 +74,7 @@ pub fn execute_command(command: Command, bash: BashManager)-> String {
         Ok(process::Command::new(full_path).args(command.args.clone()).output()?)
       };
       
-      
+    
       match output() {
         Ok(v) => return String::from_utf8_lossy(&v.stdout).to_string(),
         Err(_err) => return String::from("")
