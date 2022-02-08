@@ -15,7 +15,7 @@ impl BashManager {
     match result {
       Ok(v) => {
         print!("Unb - {} - {} ", self.username, v.display());
-        io::stdout().flush();
+        io::stdout().flush().map_err(|err| println!("{:?}", err)).ok();
       },
       Err(_e) => print!("Unb - {} - not-found ", self.username),
     }
@@ -23,19 +23,19 @@ impl BashManager {
 
   pub fn read_command(&self) -> String{
     let mut input = String::new();
-    io::stdin().read_line(&mut input);
+    io::stdin().read_line(&mut input).map_err(|err| println!("{:?}", err)).ok();
     input
   }
 
   pub fn execute(&self, pipe_sections: Vec<Command>){
-
+    // env::set_current_dir("../");
   }
 
   pub fn run(&self) {
     self.show_path();
     let command = self.read_command();
     let pipe_sections: Vec<Command> = parser_helper::parse_line(command);
-    if(pipe_sections[0].command_name.eq("exit")){
+    if pipe_sections[0].command_name.eq("exit") {
       return
     }
     self.execute(pipe_sections);
