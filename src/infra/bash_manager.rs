@@ -28,9 +28,10 @@ impl BashManager {
   }
 
   pub fn execute(&self, pipe_sections: Vec<Command>){
-    let inicial_section = pipe_sections[0].clone();
-    match inicial_section.command_name.as_str() {
-      "cd" => os_manager::cd(inicial_section.args),
+    let initial_section = pipe_sections[0].clone();
+    match initial_section.command_name.as_str() {
+      "cd" => os_manager::cd(initial_section.args),
+      "sleep" => os_manager::sleep(initial_section.args),
       _ => println!("qualquer coisa")
     }
   }
