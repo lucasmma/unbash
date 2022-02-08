@@ -1,4 +1,3 @@
-use std::env;
 use std::io;
 use std::io::Write;
 use crate::domain::model::command::Command;
@@ -11,14 +10,8 @@ pub struct BashManager {
 
 impl BashManager {
   pub fn show_path(&self) {
-    let result =  env::current_dir();
-    match result {
-      Ok(v) => {
-        print!("Unb - {} - {} ", self.username, v.display());
-        io::stdout().flush().map_err(|err| println!("{:?}", err)).ok();
-      },
-      Err(_e) => print!("Unb - {} - not-found ", self.username),
-    }
+    print!("Unb - {} - {} ", self.username, os_manager::get_current_directory());
+    io::stdout().flush().map_err(|err| println!("{:?}", err)).ok();
   }
 
   pub fn read_command(&self) -> String{
@@ -31,6 +24,7 @@ impl BashManager {
     let initial_section = pipe_sections[0].clone();
     match initial_section.command_name.as_str() {
       "cd" => os_manager::cd(initial_section.args),
+      "ls" => os_manager::ls(initial_section.args),
       "sleep" => os_manager::sleep(initial_section.args),
       _ => println!("qualquer coisa")
     }
