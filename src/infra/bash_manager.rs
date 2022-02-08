@@ -2,9 +2,9 @@ use std::env;
 use std::io;
 use std::io::Write;
 use crate::domain::model::command::Command;
+use crate::infra::os_manager;
 
 #[path = "../utils/parser_helper.rs"] mod parser_helper;
-
 pub struct BashManager {
   pub username: String
 }
@@ -28,13 +28,17 @@ impl BashManager {
   }
 
   pub fn execute(&self, pipe_sections: Vec<Command>){
-    // env::set_current_dir("../");
+    let inicial_section = pipe_sections[0].clone();
+    match inicial_section.command_name.as_str() {
+      "cd" => os_manager::cd(inicial_section.args),
+      _ => println!("qualquer coisa")
+    }
   }
 
   pub fn run(&self) {
     self.show_path();
     let command = self.read_command();
-    let pipe_sections: Vec<Command> = parser_helper::parse_line(command);
+    let pipe_sections: Vec<Command> = parser_helper::parse_commandline(command);
     if pipe_sections[0].command_name.eq("exit") {
       return
     }
