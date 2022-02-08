@@ -40,6 +40,7 @@ impl BashManager {
       "mkdir" => os_manager::mkdir(initial_section.args),
       "echo" => os_manager::echo(initial_section.args),
       "history" => os_manager::history(initial_section.args, (*self).clone()),
+      "ver" => os_manager::ver(initial_section.args),
       _ => println!("qualquer coisa")
     }
   }

@@ -118,3 +118,11 @@ pub fn history(args: Vec<String>, mut bash: BashManager) {
     }; 
   }
 }
+
+pub fn ver(args: Vec<String>) {
+  if args.len() == 0 {
+    println!("Versão 1.0.0 - 08/02/22 - lucasmma")
+  } else {
+    println!("Comando não deve ser inserido com argumento");
+  }
+}
