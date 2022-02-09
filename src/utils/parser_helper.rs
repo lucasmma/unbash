@@ -13,11 +13,17 @@ pub fn parse_commandline(line: String) -> Vec<Command>{
   return pipe_sections_parsed;
 }
 
-pub fn parse_paths(line: String) -> Vec<String>{
-  if line.len() == 0 {
+pub fn parse_paths(content: String) -> Vec<String>{
+  let lines: Vec<String> = content.split("\n").map(|s| s.to_string()).collect();
+  if lines.len() == 0 {
     return vec![]
   } else {
-    let straigth_path = line.replace("PATH=", "");
-    return straigth_path.split(";").map(|s| s.to_string()).collect();
+    for line in lines {
+      let paths : Vec<String> = line.split("=").map(|s| s.to_string()).collect();
+      if paths[0] == "PATH"{
+        return paths[1].split(";").map(|s| s.to_string()).collect();
+      }
+    }
+    return vec![]
   }
 }
