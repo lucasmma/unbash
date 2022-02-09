@@ -3,6 +3,7 @@ use std::io::Write;
 use crate::domain::model::command::Command;
 use crate::infra::os_manager;
 use crate::utils::parser_helper;
+use crate::utils::file_helper;
 
 #[derive(Clone)]
 pub struct BashManager {
@@ -10,6 +11,7 @@ pub struct BashManager {
   pub history: Vec<String>,
   pub paths: Vec<String>
 }
+
 
 impl BashManager {
   pub fn enqueue_command(&mut self, command: String){
@@ -30,16 +32,35 @@ impl BashManager {
     input
   }
 
-  pub fn execute(&self, pipe_sections: Vec<Command>){
-    for section in pipe_sections.clone() {
+  pub fn execute(&self, pipe_sections: &Vec<Command>){
+    let mut i = 0;
+    let last_index = pipe_sections.len() - 1;
+    let mut output_added = false;
+    let mut home = os_manager::get_home_directory();
+    home.push_str("/.unbsh_temp");
+    for section in pipe_sections.clone().iter_mut() {
+      if output_added {
+        section.args.push(home.clone());
+        output_added = false;
+      }
       match section.command_name.as_str() {
-        "cd" => os_manager::cd(section.args),
-        "ver" => os_manager::ver(section.args),
-        "history" => os_manager::history(section.args, (*self).clone()),
+        "cd" => os_manager::cd(section.args.clone()),
+        "ver" => os_manager::ver(section.args.clone()),
+        "history" => os_manager::history(section.args.clone(), (*self).clone()),
         _ => {
-          os_manager::execute_command(section, (*self).clone());
+          let output = os_manager::execute_command(section.clone(), (*self).clone());
+          file_helper::delete_file(home.clone());
+          // println!("{:#?}", section.args);
+          // print!("{}", output);
+          if i == last_index {
+            print!("{}", output)
+          } else{
+            file_helper::create_write_file(home.clone(), output);
+            output_added = true;
+          }
         }
       }
+      i += 1;
     }
   }
 
@@ -56,12 +77,12 @@ impl BashManager {
       return
     }
 
-    let pipe_sections: Vec<Command> = self.parse_command(command.clone());
+    let mut pipe_sections: Vec<Command> = self.parse_command(command.clone());
     if pipe_sections[0].command_name.eq("exit") {
       return
     }
     
-    self.execute(pipe_sections);
+    self.execute(&mut pipe_sections);
     self.enqueue_command(command);
     self.run();
   }

@@ -1,6 +1,7 @@
 use std::fs;
 use crate::infra::bash_manager::BashManager;
 use crate::domain::model::command::Command;
+use crate::utils::file_helper;
 use std::process;
 use home;
 use std::io::Error;
@@ -41,8 +42,8 @@ pub fn history(args: Vec<String>, mut bash: BashManager) {
     match args[0].parse::<usize>() {
       Ok(num) => {
         if num > 0 && num <= 10 && num < bash.history.len() {
-          let command: Vec<Command> = bash.parse_command(bash.history[num-1].clone());
-          bash.execute(command);
+          let mut command: Vec<Command> = bash.parse_command(bash.history[num-1].clone());
+          bash.execute(&mut command);
         } else{
           println!("Número fora da range");
         }
@@ -76,8 +77,14 @@ pub fn execute_command(command: Command, bash: BashManager)-> String {
       
     
       match output() {
-        Ok(v) => return String::from_utf8_lossy(&v.stdout).to_string(),
-        Err(_err) => return String::from("")
+        Ok(v) => {
+          // println!("{:#?}", v.stdout);
+          // file_helper::create_write_file(String::from("ola.txt"), String::from_utf8_lossy(&v.stdout).to_string());
+          return String::from_utf8(v.stdout).unwrap()
+        },
+        Err(_err) => {
+          return String::from("")
+        }
       }
     }
   }
