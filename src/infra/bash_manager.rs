@@ -48,6 +48,10 @@ impl BashManager {
         "ver" => os_manager::ver(section.args.clone()),
         "history" => os_manager::history(section.args.clone(), (*self).clone()),
         _ => {
+          if section.args.iter().any(|i| i=="<" || i==">" || i==">>") {
+            print!("{}", os_manager::redir(section.clone(), (*self).clone()));
+            return
+          }
           let output = os_manager::execute_command(section.clone(), (*self).clone());
           file_helper::delete_file(home.clone());
           // println!("{:#?}", section.args);
@@ -72,7 +76,7 @@ impl BashManager {
   pub fn run(&mut self) {
     self.show_path();
     let command = self.read_command();
-    if command.len() == 0{
+    if command.len() == 1 {
       self.run();
       return
     }

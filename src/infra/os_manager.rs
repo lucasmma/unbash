@@ -1,4 +1,3 @@
-use std::fs;
 use crate::infra::bash_manager::BashManager;
 use crate::domain::model::command::Command;
 use crate::utils::file_helper;
@@ -70,7 +69,7 @@ pub fn execute_command(command: Command, bash: BashManager)-> String {
       full_path.push_str("/");
     }
     full_path.push_str(command.command_name.as_str());
-    if fs::metadata(full_path.clone()).is_ok() {
+    if file_helper::file_exists(full_path.clone()) {
       let output = || -> Result<process::Output, Error> {
         Ok(process::Command::new(full_path).args(command.args.clone()).output()?)
       };
@@ -90,4 +89,35 @@ pub fn execute_command(command: Command, bash: BashManager)-> String {
   }
 
     return String::from("Não achei o comando")
+}
+
+pub fn redir(mut section: Command, bash: BashManager)-> String{
+  let index = section.args.iter().position(|x| *x == "<" || *x == ">" || *x == ">>").unwrap();
+  if section.args.iter().any(|i| i=="<") {
+    section.args.remove(index);
+    return execute_command(section, bash);
+  } else {
+    if index < section.args.len() - 1 {
+      let filename = section.args[index + 1].clone();
+      let signal = section.args[index].clone();
+      section.args.remove(index + 1);
+      section.args.remove(index);
+      let output = execute_command(section.clone(), bash);
+      if output.eq("Não achei o comando"){
+        return "Não achei o comando".to_string()
+      } else if output.eq(""){
+        return "".to_string()
+      } else{
+        if signal.eq(">") {
+          file_helper::create_write_file(filename, output);
+          return "".to_string()
+        } else {
+          file_helper::append_file(filename, output);
+          return "".to_string()
+        }
+      }
+    } else {
+      return "Argumentos inválidos".to_string()
+    }
+  } 
 }
