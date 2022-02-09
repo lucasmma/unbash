@@ -10,7 +10,8 @@ use crate::utils::file_helper;
 pub struct BashManager {
   pub username: String,
   pub history: Vec<String>,
-  pub paths: Vec<String>
+  pub paths: Vec<String>,
+  pub aliases: Vec<(String, String)>
 }
 
 
@@ -33,6 +34,17 @@ impl BashManager {
     input
   }
 
+  pub fn decode_command(&self, command: &mut Command) -> Command {
+    for alias in &self.aliases {
+      if alias.1 == command.command_name {
+        let decoded_command = Command {command_name: alias.0.clone(), args: command.args.clone()};
+        return decoded_command
+      }
+    }
+    let decoded_command = Command {command_name: command.command_name.clone(), args: command.args.clone()};
+    return decoded_command
+  }
+
   pub fn execute(&self, pipe_sections: &Vec<Command>){
     let mut i = 0;
     let last_index = pipe_sections.len() - 1;
@@ -44,16 +56,17 @@ impl BashManager {
         section.args.push(home.clone());
         output_added = false;
       }
-      match section.command_name.as_str() {
-        "cd" => os_manager::cd(section.args.clone()),
-        "ver" => os_manager::ver(section.args.clone()),
-        "history" => os_manager::history(section.args.clone(), (*self).clone()),
+      let decoded_section = self.decode_command(section);
+      match decoded_section.command_name.as_str() {
+        "cd" => os_manager::cd(decoded_section.args.clone()),
+        "ver" => os_manager::ver(decoded_section.args.clone()),
+        "history" => os_manager::history(decoded_section.args.clone(), (*self).clone()),
         _ => {
-          if section.args.iter().any(|i| i=="<" || i==">" || i==">>") {
-            print!("{}", os_manager::redir(section.clone(), (*self).clone()));
+          if decoded_section.args.iter().any(|i| i=="<" || i==">" || i==">>") {
+            print!("{}", os_manager::redir(decoded_section.clone(), (*self).clone()));
             return
           }
-          let output = os_manager::execute_command(section.clone(), (*self).clone());
+          let output = os_manager::execute_command(decoded_section.clone(), (*self).clone());
           file_helper::delete_file(home.clone());
           if i == last_index {
             print!("{}", output)

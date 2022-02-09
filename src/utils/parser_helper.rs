@@ -27,3 +27,19 @@ pub fn parse_paths(content: String) -> Vec<String>{
     return vec![]
   }
 }
+
+pub fn parse_aliases(content: String) -> Vec<(String, String)>{
+  let lines: Vec<String> = content.split("\n").map(|s| s.to_string()).collect();
+  if lines.len() == 0 {
+    return vec![]
+  } else {
+    let mut aliases : Vec<(String, String)>= vec![];
+    for line in lines {
+      let alias_line : Vec<String> = line.replace("\"", "").split_whitespace().map(|s| s.to_string()).collect();
+      if alias_line.len() != 0 && alias_line[0] == "alias"{
+        aliases.push((alias_line[1].clone(), alias_line[2].clone()))
+      }
+    }
+    return aliases
+  }
+}
