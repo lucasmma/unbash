@@ -1,5 +1,6 @@
 use std::io;
 use std::io::Write;
+use std::thread;
 use crate::domain::model::command::Command;
 use crate::infra::os_manager;
 use crate::utils::parser_helper;
@@ -54,8 +55,6 @@ impl BashManager {
           }
           let output = os_manager::execute_command(section.clone(), (*self).clone());
           file_helper::delete_file(home.clone());
-          // println!("{:#?}", section.args);
-          // print!("{}", output);
           if i == last_index {
             print!("{}", output)
           } else{
@@ -73,6 +72,19 @@ impl BashManager {
     command
   }
 
+  pub fn execute_async(&mut self, command: &Vec<Command>, input_command: &String, last_pipe_index: usize, last_arg_index: usize) {
+    let clone_self = self.clone();
+    let mut clone_command = command.clone();
+    let clone_input_command = input_command.clone();
+    println!("Processo em background [{}] foi iniciado", 1);
+    clone_command[last_pipe_index].args.remove(last_arg_index);
+    thread::spawn(move || {
+      clone_self.execute(&clone_command);
+      print!("Processo em background [{}] executado {}", 1, clone_input_command);
+      clone_self.show_path()
+    });
+  }
+
   pub fn run(&mut self) {
     self.show_path();
     let command = self.read_command();
@@ -80,13 +92,20 @@ impl BashManager {
       self.run();
       return
     }
-
-    let mut pipe_sections: Vec<Command> = self.parse_command(command.clone());
+    let pipe_sections: Vec<Command> = self.parse_command(command.clone());
     if pipe_sections[0].command_name.eq("exit") {
       return
     }
+
+    // out of bounds
+    let last_pipe_index = pipe_sections.len()-1;
+    if pipe_sections[last_pipe_index].args.len() > 0 && pipe_sections[last_pipe_index].args[pipe_sections[last_pipe_index].args.len()-1] == "&" {
+      let last_arg_index = pipe_sections[last_pipe_index].args.len() - 1;
+      self.execute_async(&pipe_sections, &command, last_pipe_index, last_arg_index)
+    } else {
+      self.execute(&pipe_sections);
+    }
     
-    self.execute(&mut pipe_sections);
     self.enqueue_command(command);
     self.run();
   }

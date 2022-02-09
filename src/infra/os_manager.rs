@@ -82,13 +82,13 @@ pub fn execute_command(command: Command, bash: BashManager)-> String {
           return String::from_utf8(v.stdout).unwrap()
         },
         Err(_err) => {
-          return String::from("")
+          return String::from("Erro\n")
         }
       }
     }
   }
 
-    return String::from("Não achei o comando")
+    return String::from("Não achei o comando\n")
 }
 
 pub fn redir(mut section: Command, bash: BashManager)-> String{
@@ -103,10 +103,10 @@ pub fn redir(mut section: Command, bash: BashManager)-> String{
       section.args.remove(index + 1);
       section.args.remove(index);
       let output = execute_command(section.clone(), bash);
-      if output.eq("Não achei o comando"){
-        return "Não achei o comando".to_string()
-      } else if output.eq(""){
-        return "".to_string()
+      if output.clone().replace("\n", "").eq("Não achei o comando"){
+        return "Não achei o comandp\n".to_string()
+      } else if output.clone().replace("\n", "").eq("Erro"){
+        return "Erro\n".to_string()
       } else{
         if signal.eq(">") {
           file_helper::create_write_file(filename, output);
@@ -117,7 +117,7 @@ pub fn redir(mut section: Command, bash: BashManager)-> String{
         }
       }
     } else {
-      return "Argumentos inválidos".to_string()
+      return "Argumentos inválidos\n".to_string()
     }
   } 
 }
