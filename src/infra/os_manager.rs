@@ -104,7 +104,7 @@ pub fn redir(mut section: Command, bash: BashManager)-> String{
       section.args.remove(index);
       let output = execute_command(section.clone(), bash);
       if output.clone().replace("\n", "").eq("Não achei o comando"){
-        return "Não achei o comandp\n".to_string()
+        return "Não achei o comando\n".to_string()
       } else if output.clone().replace("\n", "").eq("Erro"){
         return "Erro\n".to_string()
       } else{
