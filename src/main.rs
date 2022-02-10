@@ -4,6 +4,7 @@ mod utils;
 
 use whoami;
 
+use crate::domain::model::command::Command;
 use crate::infra::bash_manager::BashManager;
 use crate::infra::os_manager::get_home_directory;
 use crate::utils::parser_helper;
@@ -40,5 +41,14 @@ fn main() {
     let paths : Vec<String> = read_profile(String::from("/.unbshrc_profile"));
     let aliases : Vec<(String, String)> = read_aliases(String::from("/.unbshrc"));
     let mut bash = BashManager{ username: whoami::username(), history: vec![], paths: paths, aliases: aliases, process_id: 1 };
-    bash.run();
+
+    let arguments : Vec<String> = std::env::args().collect();
+    
+    if arguments.clone().len() > 1 {
+        let filename = arguments[1].clone();
+        bash.execute_batch(&vec![Command{command_name: filename, args: vec![]}]);
+    } else{
+        bash.run();
+    }
+
 }
