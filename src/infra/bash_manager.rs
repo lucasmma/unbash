@@ -14,7 +14,6 @@ pub struct BashManager {
   pub aliases: Vec<(String, String)>
 }
 
-
 impl BashManager {
   pub fn enqueue_command(&mut self, command: String){
     if self.history.len() >= 10 {
@@ -85,19 +84,47 @@ impl BashManager {
     command
   }
 
-  pub fn execute_async(&mut self, command: &Vec<Command>, input_command: &String, last_pipe_index: usize, last_arg_index: usize) {
+  pub fn execute_async(&mut self, pipe_sections: &Vec<Command>, input_command: &String, last_pipe_index: usize, last_arg_index: usize) {
     let clone_self = self.clone();
-    let mut clone_command = command.clone();
+    let mut clone_pipe_sections = pipe_sections.clone();
     let clone_input_command = input_command.clone();
     println!("Processo em background [{}] foi iniciado", 1);
-    clone_command[last_pipe_index].args.remove(last_arg_index);
+    clone_pipe_sections[last_pipe_index].args.remove(last_arg_index);
     thread::spawn(move || {
-      clone_self.execute(&clone_command);
+      clone_self.execute(&clone_pipe_sections);
       print!("Processo em background [{}] executado {}", 1, clone_input_command);
       clone_self.show_path()
     });
   }
 
+  pub fn execute_batch(&mut self, pipe_sections: &Vec<Command>) {
+    if pipe_sections.len() > 1 {
+      println!("Mais de uma pipe_section");
+    } else {
+      if pipe_sections[0].args.len() > 0 {
+        println!("Não passar argumento ao executar o  programa");
+      } else {
+        let command = pipe_sections[0].command_name.replace("./", "");
+        let lines = parser_helper::parse_batch_program(command);
+        for line in lines {
+          let pipe_sections: Vec<Command> = parser_helper::parse_commandline(line.clone());
+          self.sync_async_execute(&pipe_sections, &line);
+        }
+      }
+    }
+  }
+
+  pub fn sync_async_execute(&mut self, pipe_sections: &Vec<Command>, input_command: &String) {
+    let last_pipe_index = pipe_sections.len()-1;
+    if pipe_sections[last_pipe_index].args.len() > 0 && pipe_sections[last_pipe_index].args[pipe_sections[last_pipe_index].args.len()-1] == "&" {
+      let last_arg_index = pipe_sections[last_pipe_index].args.len() - 1;
+      //tirar os argumentos de index e tirar o & daqui
+      self.execute_async(&pipe_sections, &input_command, last_pipe_index, last_arg_index)
+    } else {
+      self.execute(&pipe_sections);
+    }
+  }
+   
   pub fn run(&mut self) {
     self.show_path();
     let command = self.read_command();
@@ -105,18 +132,16 @@ impl BashManager {
       self.run();
       return
     }
+    
     let pipe_sections: Vec<Command> = self.parse_command(command.clone());
     if pipe_sections[0].command_name.eq("exit") {
       return
     }
 
-    // out of bounds
-    let last_pipe_index = pipe_sections.len()-1;
-    if pipe_sections[last_pipe_index].args.len() > 0 && pipe_sections[last_pipe_index].args[pipe_sections[last_pipe_index].args.len()-1] == "&" {
-      let last_arg_index = pipe_sections[last_pipe_index].args.len() - 1;
-      self.execute_async(&pipe_sections, &command, last_pipe_index, last_arg_index)
-    } else {
-      self.execute(&pipe_sections);
+    if pipe_sections[0].command_name.contains("./"){
+      self.execute_batch(&pipe_sections);
+    } else{
+      self.sync_async_execute(&pipe_sections, &command)
     }
     
     self.enqueue_command(command);

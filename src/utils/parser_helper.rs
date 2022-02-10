@@ -43,3 +43,18 @@ pub fn parse_aliases(content: String) -> Vec<(String, String)>{
     return aliases
   }
 }
+
+pub fn parse_batch_program(content: String) -> Vec<String>{
+  let lines: Vec<String> = content.split("\n").map(|s| s.to_string()).collect();
+  if lines.len() == 0 {
+    return vec![]
+  } else {
+    let mut batch_lines : Vec<String>= vec![];
+    for line in lines {
+      if line.len() != 0 && line.chars().nth(0).unwrap() != "#".to_string().chars().nth(0).unwrap() {
+        batch_lines.push(line)
+      }
+    }
+    return batch_lines
+  }
+}
