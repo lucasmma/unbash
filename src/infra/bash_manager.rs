@@ -46,38 +46,23 @@ impl BashManager {
   }
 
   pub fn execute(&self, pipe_sections: &Vec<Command>){
-    let mut i = 0;
-    let last_index = pipe_sections.len() - 1;
-    let mut output_added = false;
-    let mut home = os_manager::get_home_directory();
-    home.push_str("/.unbsh_temp");
+    let mut output : String = "".to_string();
     for section in pipe_sections.clone().iter_mut() {
-      if output_added {
-        section.args.push(home.clone());
-        output_added = false;
-      }
       let decoded_section = self.decode_command(section);
       match decoded_section.command_name.as_str() {
-        "cd" => os_manager::cd(decoded_section.args.clone()),
-        "ver" => os_manager::ver(decoded_section.args.clone()),
-        "history" => os_manager::history(decoded_section.args.clone(), (*self).clone()),
+        "cd" => output = os_manager::cd(decoded_section.args.clone()),
+        "ver" => output = os_manager::ver(decoded_section.args.clone()),
+        "history" => output = os_manager::history(decoded_section.args.clone(), (*self).clone()),
         _ => {
           if decoded_section.args.iter().any(|i| i=="<" || i==">" || i==">>") {
-            print!("{}", os_manager::redir(decoded_section.clone(), (*self).clone()));
-            return
-          }
-          let output = os_manager::execute_command(decoded_section.clone(), (*self).clone());
-          file_helper::delete_file(home.clone());
-          if i == last_index {
-            print!("{}", output)
-          } else{
-            file_helper::create_write_file(home.clone(), output);
-            output_added = true;
+            output = os_manager::redir(decoded_section.clone(), (*self).clone());
+          } else {
+            output = os_manager::execute_command(decoded_section.clone(), (*self).clone(), output.clone());
           }
         }
       }
-      i += 1;
     }
+    print!("{}", output);
   }
 
   pub fn parse_command(&mut self, command: String) -> Vec<Command> {
