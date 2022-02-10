@@ -94,7 +94,7 @@ impl BashManager {
     clone_pipe_sections[last_pipe_index].args.remove(last_arg_index);
     thread::spawn(move || {
       clone_self.execute(&clone_pipe_sections);
-      print!("Processo em background [{}] executado {}", clone_process_id, clone_input_command);
+      print!("Processo em background [{}] executado {}\n", clone_process_id, clone_input_command);
       clone_self.show_path()
     });
     self.process_id += 1;
@@ -107,8 +107,8 @@ impl BashManager {
       if pipe_sections[0].args.len() > 0 {
         println!("Não passar argumento ao executar o  programa");
       } else {
-        let command = pipe_sections[0].command_name.replace("./", "");
-        let lines = parser_helper::parse_batch_program(command);
+        let filename = pipe_sections[0].command_name.replace("./", "");
+        let lines = parser_helper::parse_batch_program(file_helper::read_file(filename));
         for line in lines {
           let pipe_sections: Vec<Command> = parser_helper::parse_commandline(line.clone());
           self.sync_async_execute(&pipe_sections, &line);
