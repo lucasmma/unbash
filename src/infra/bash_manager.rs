@@ -11,7 +11,8 @@ pub struct BashManager {
   pub username: String,
   pub history: Vec<String>,
   pub paths: Vec<String>,
-  pub aliases: Vec<(String, String)>
+  pub aliases: Vec<(String, String)>,
+  pub process_id: i64
 }
 
 impl BashManager {
@@ -88,13 +89,15 @@ impl BashManager {
     let clone_self = self.clone();
     let mut clone_pipe_sections = pipe_sections.clone();
     let clone_input_command = input_command.clone();
-    println!("Processo em background [{}] foi iniciado", 1);
+    let clone_process_id = clone_self.process_id.clone();
+    println!("Processo em background [{}] foi iniciado", clone_process_id.clone());
     clone_pipe_sections[last_pipe_index].args.remove(last_arg_index);
     thread::spawn(move || {
       clone_self.execute(&clone_pipe_sections);
-      print!("Processo em background [{}] executado {}", 1, clone_input_command);
+      print!("Processo em background [{}] executado {}", clone_process_id, clone_input_command);
       clone_self.show_path()
     });
+    self.process_id += 1;
   }
 
   pub fn execute_batch(&mut self, pipe_sections: &Vec<Command>) {

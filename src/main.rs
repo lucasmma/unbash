@@ -36,8 +36,9 @@ fn read_aliases(filename: String) -> Vec<(String, String)> {
 }
 
 fn main() {
+    //checar se vem algum caminho de arquivo no 
     let paths : Vec<String> = read_profile(String::from("/.unbshrc_profile"));
     let aliases : Vec<(String, String)> = read_aliases(String::from("/.unbshrc"));
-    let mut bash = BashManager{ username: whoami::username(), history: vec![], paths: paths, aliases: aliases };
+    let mut bash = BashManager{ username: whoami::username(), history: vec![], paths: paths, aliases: aliases, process_id: 1 };
     bash.run();
 }
