@@ -37,7 +37,6 @@ pub fn history(args: Vec<String>, mut bash: BashManager) -> String {
     let mut commands : String = "".to_owned();
     for command_lines in bash.history.clone() {
       commands.push_str(command_lines.as_str());
-      commands.push_str("\n");
     }
     return commands
   } else if args.len() > 1 {
