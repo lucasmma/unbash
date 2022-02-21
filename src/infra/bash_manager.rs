@@ -94,9 +94,12 @@ impl BashManager {
       } else {
         let filename = pipe_sections[0].command_name.replace("./", "");
         let lines = parser_helper::parse_batch_program(file_helper::read_file(filename));
-        for line in lines {
+        for mut line in lines {
+          println!("{}", line);
           let pipe_sections: Vec<Command> = parser_helper::parse_commandline(line.clone());
           self.sync_async_execute(&pipe_sections, &line);
+          line.push_str("\n");
+          self.enqueue_command(line);
         }
       }
     }
