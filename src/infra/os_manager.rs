@@ -35,8 +35,10 @@ pub fn cd(args: Vec<String>) -> String {
 pub fn history(args: Vec<String>, mut bash: BashManager) -> String {
   if args.len() == 0 {
     let mut commands : String = "".to_owned();
+    let mut index = 1;
     for command_lines in bash.history.clone() {
-      commands.push_str(command_lines.as_str());
+      commands.push_str(format!("{} {}", index, command_lines.as_str()).as_str());
+      index+=1;
     }
     return commands
   } else if args.len() > 1 {
