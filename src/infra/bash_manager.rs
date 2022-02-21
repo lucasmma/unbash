@@ -57,7 +57,7 @@ impl BashManager {
           if decoded_section.args.iter().any(|i| i=="<" || i==">" || i==">>") {
             output = os_manager::redir(decoded_section.clone(), (*self).clone());
           } else {
-            output = os_manager::execute_command(decoded_section.clone(), (*self).clone(), output.clone());
+            output = os_manager::execute_command(decoded_section.clone(), (*self).clone(), output.clone(), pipe_sections.len() == 1);
           }
         }
       }
@@ -95,7 +95,6 @@ impl BashManager {
         let filename = pipe_sections[0].command_name.replace("./", "");
         let lines = parser_helper::parse_batch_program(file_helper::read_file(filename));
         for mut line in lines {
-          println!("{}", line);
           let pipe_sections: Vec<Command> = parser_helper::parse_commandline(line.clone());
           self.sync_async_execute(&pipe_sections, &line);
           line.push_str("\n");

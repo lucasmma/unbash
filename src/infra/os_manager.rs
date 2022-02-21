@@ -69,7 +69,7 @@ pub fn ver(args: Vec<String>) -> String{
   }
 }
 
-pub fn execute_command(command: Command, bash: BashManager, stdin: String)-> String {
+pub fn execute_command(command: Command, bash: BashManager, stdin: String, unique_section: bool)-> String {
   for path in bash.paths {
     let mut full_path : String = path.clone();
     if path.chars().nth(path.len()-1).unwrap() != '/' {
@@ -80,8 +80,13 @@ pub fn execute_command(command: Command, bash: BashManager, stdin: String)-> Str
       let process = || -> Result<std::process::Child, Error> {
         let mut child = process::Command::new(full_path);
         child.args(command.args.clone());
-        child.stdin(std::process::Stdio::piped());
-        child.stdout(std::process::Stdio::piped());
+        if unique_section {
+          child.stdout(std::process::Stdio::inherit());
+          child.stdin(std::process::Stdio::inherit());
+        } else {
+          child.stdin(std::process::Stdio::piped());
+          child.stdout(std::process::Stdio::piped());
+        }
         Ok(child.spawn()?)
       };
       
@@ -117,14 +122,14 @@ pub fn redir(mut section: Command, bash: BashManager)-> String{
   let index = section.args.iter().position(|x| *x == "<" || *x == ">" || *x == ">>").unwrap();
   if section.args.iter().any(|i| i=="<") {
     section.args.remove(index);
-    return execute_command(section, bash, "".to_string());
+    return execute_command(section, bash, "".to_string(), true);
   } else {
     if index < section.args.len() - 1 {
       let filename = section.args[index + 1].clone();
       let signal = section.args[index].clone();
       section.args.remove(index + 1);
       section.args.remove(index);
-      let output = execute_command(section.clone(), bash, "".to_string());
+      let output = execute_command(section.clone(), bash, "".to_string(), true);
       if output.clone().replace("\n", "").eq("Não achei o comando"){
         return "Não achei o comando\n".to_string()
       } else if output.clone().replace("\n", "").eq("Erro"){
