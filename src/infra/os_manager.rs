@@ -61,9 +61,9 @@ pub fn history(args: Vec<String>, mut bash: BashManager) -> String {
 
 pub fn ver(args: Vec<String>) -> String{
   if args.len() == 0 {
-    return String::from("Versão 1.0.0 - 08/02/22 - lucasmma")
+    return String::from("Versão 1.0.0 - 08/02/22 - lucasmma\n")
   } else {
-    return String::from("Comando não deve ser inserido com argumento");
+    return String::from("Comando não deve ser inserido com argumento\n");
   }
 }
 
