@@ -123,6 +123,8 @@ impl BashManager {
       return
     }
     
+    self.enqueue_command(command.clone());
+    
     let pipe_sections: Vec<Command> = self.parse_command(command.clone());
     if pipe_sections[0].command_name.eq("exit") {
       return
@@ -134,7 +136,6 @@ impl BashManager {
       self.sync_async_execute(&pipe_sections, &command)
     }
     
-    self.enqueue_command(command);
     self.run();
   }
 
