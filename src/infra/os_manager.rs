@@ -75,7 +75,10 @@ pub fn execute_command(command: Command, bash: BashManager, stdin: String, uniqu
     if path.chars().nth(path.len()-1).unwrap() != '/' {
       full_path.push_str("/");
     }
-    full_path.push_str(command.command_name.as_str());
+    full_path.push_str(command.command_name.clone().as_str());
+    if file_helper::file_exists(command.command_name.clone()) {
+      full_path = command.command_name.clone();
+    }
     if file_helper::file_exists(full_path.clone()) {
       let process = || -> Result<std::process::Child, Error> {
         let mut child = process::Command::new(full_path);
